@@ -99,6 +99,11 @@ void venderProduto(Produto produtos[], int quantidade_produtos) {
             printf("Quantidade desejada: ");
             scanf("%d", &quantidade);
             
+            if(quantidade <= 0) {
+                printf("Quantidade inválida!\n");
+                return;
+            }
+            
             if(produtos[i].quantidade_estoque == 0) {
                 printf("Produto sem estoque disponível!\n");
                 return;
@@ -107,7 +112,7 @@ void venderProduto(Produto produtos[], int quantidade_produtos) {
             if(quantidade <= produtos[i].quantidade_estoque) {
                 produtos[i].quantidade_estoque -= quantidade;
                 double total = produtos[i].valor_unitario * quantidade;
-                printf("Valor total: R$ %.2lf\n", total);
+                printf("Venda realizada! Valor total: R$ %.2lf\n", total);
             } else {
                 char opcao;
                 printf("Quantidade insuficiente! Deseja comprar todo o estoque? (S/N): ");
@@ -158,6 +163,11 @@ void atualizarEstoque(Produto produtos[], int quantidade_produtos) {
 
 void listarProdutos(Produto produtos[], int quantidade_produtos) {
     printf("\n--- Todos os Produtos ---\n");
+    if(quantidade_produtos == 0) {
+        printf("Nenhum produto cadastrado!\n");
+        return;
+    }
+    
     for(int i = 0; i < quantidade_produtos; i++) {
         printf("Código: %d | Descrição: %s\n", produtos[i].codigo, produtos[i].descricao);
     }
