@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define ESTADOS 26
+
 struct DadosEstado {
     char nome[20];
     int numVeiculos;
@@ -8,78 +10,73 @@ struct DadosEstado {
 };
 
 void coletarDados(struct DadosEstado d[]) {
-    for (int i = 0; i < 26; i++) {
-        printf("Digite o nome do Estado: ");
-        fgets(d[i].nome, 20, stdin);
-        d[i].nome[strcspn(d[i].nome, "\n")] = '\0';
-        
-        printf("Digite o número de veículos do estado: ");
+    char lista_estados[ESTADOS][20] = {
+        "Acre", "Alagoas", "Amapa", "Amazonas", "Bahia", "Ceara",
+        "Espirito Santo", "Goias", "Maranhao", "Mato Grosso", "Mato Grosso do Sul",
+        "Minas Gerais", "Para", "Paraiba", "Parana", "Pernambuco", "Piaui", "Rio de Janeiro",
+        "Rio Grande do Norte", "Rio Grande do Sul", "Rondonia", "Roraima", "Santa Catarina", "Sao Paulo",
+        "Sergipe", "Tocantins"
+    };
+    
+    for (int i = 0; i < ESTADOS; i++) {
+        strcpy(d[i].nome, lista_estados[i]);
         scanf("%d", &d[i].numVeiculos);
-        getchar();
-        
-        printf("Digite o número de Acidentes no estado: ");
         scanf("%d", &d[i].Acidentes);
-        getchar();
     }
 }
 
 void encontrarExtremos(struct DadosEstado d[], int *maior, int *menor) {
     *maior = 0;
     *menor = 0;
-    for (int i = 1; i < 26; i++) {
+    for (int i = 1; i < ESTADOS; i++) {
         if (d[i].Acidentes > d[*maior].Acidentes) *maior = i;
         if (d[i].Acidentes < d[*menor].Acidentes) *menor = i;
     }
 }
 
-double percentualAcidentes(struct DadosEstado d[], char nomeEstado[]) {
-    for (int i = 0; i < 26; i++) {
-        if (strcmp(nomeEstado, d[i].nome) == 0) {
-            return (d[i].Acidentes / (double)d[i].numVeiculos) * 100.0;
-        }
-    }
-    return -1.0;
+double percentualAcidentes(struct DadosEstado estado) {
+    if (estado.numVeiculos == 0) return 0.0;
+    return (estado.Acidentes * 100.0) / estado.numVeiculos;
 }
 
 double mediaAcidentes(struct DadosEstado d[]) {
-    int somatorio = 0;
-    for (int i = 0; i < 26; i++) {
-        somatorio += d[i].Acidentes;
+    int total = 0;
+    for (int i = 0; i < ESTADOS; i++) {
+        total += d[i].Acidentes;
     }
-    return (double)somatorio / 26.0;
+    return (double)total / ESTADOS;
 }
 
 void acimaDaMedia(struct DadosEstado d[], double media) {
-    for (int i = 0; i < 26; i++) {
+    for (int i = 0; i < ESTADOS; i++) {
         if (d[i].Acidentes > media) {
-            printf("O Estado %s tem acidentes acima da media\n", d[i].nome);
+            printf("%s\n", d[i].nome);
         }
     }
 }
 
 int main() {
-    struct DadosEstado Dados[26];
+    struct DadosEstado Dados[ESTADOS];
+    int indice_maior, indice_menor;
+    double media;
+    
+    printf("Cole os comandos necessários: ");
     coletarDados(Dados);
     
-    int maior, menor;
-    encontrarExtremos(Dados, &maior, &menor);
-    printf("Estado com mais acidentes: %s\n", Dados[maior].nome);
-    printf("Estado com menos acidentes: %s\n", Dados[menor].nome);
+    encontrarExtremos(Dados, &indice_maior, &indice_menor);
+    printf("\n\nEstado com mais acidentes: %s\n", Dados[indice_maior].nome);
+    printf("Estado com menos acidentes: %s\n", Dados[indice_menor].nome);
     
-    char nome[20];
-    printf("Digite o nome do estado para o percentual: ");
-    fgets(nome, 20, stdin);
-    nome[strcspn(nome, "\n")] = '\0'; // Remove o '\n'
-    
-    double percentual = percentualAcidentes(Dados, nome);
-    if (percentual >= 0) {
-        printf("Percentual de acidentes em %s: %.2lf%%\n", nome, percentual);
-    } else {
-        printf("Estado nao encontrado!\n");
+    printf("Percentual de acidentes por veiculo em cada estado:\n");
+    for (int i = 0; i < ESTADOS; i++) {
+        double percentual = percentualAcidentes(Dados[i]);
+        printf("%s: %.2f%%\n", Dados[i].nome, percentual);
     }
     
-    double media = mediaAcidentes(Dados);
-    printf("Media de acidentes no pais: %.2lf\n", media);
+    media = mediaAcidentes(Dados);
+    printf("Media de acidentes: %.2f\n por estado.\n", media);
+    
+    printf("Estados com acidentes acima da media:\n");
     acimaDaMedia(Dados, media);
     
     return 0;
